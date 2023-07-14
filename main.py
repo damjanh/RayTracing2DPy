@@ -2,6 +2,7 @@ import pygame as pg
 import pygame.display
 import sys
 import math
+import random
 
 WINDOW_SIZE = (1200, 800)
 NUM_RAYS = 180
@@ -82,19 +83,28 @@ class Game:
         self.screen = pygame.display.set_mode(WINDOW_SIZE)
         self.display = pygame.Surface(WINDOW_SIZE)
 
-        self.walls = self.generate_walls()
-        self.walls.append(Wall(self.display, (0, 0), (800, 600), 'white'))
+        self.walls = []
+
+        self.generate_walls()
+        self.generate_random_walls(4)
 
         self.rays = self.generate_rays()
 
     def generate_walls(self):
-        walls = []
-        walls.append(Wall(self.display, (0, 0), (WINDOW_SIZE[0], 0)))
-        walls.append(Wall(self.display, (0, 0), (0, WINDOW_SIZE[1])))
-        walls.append(Wall(self.display, (WINDOW_SIZE[0], 0), (WINDOW_SIZE[0], WINDOW_SIZE[1])))
-        walls.append(Wall(self.display, (0, WINDOW_SIZE[1]), (WINDOW_SIZE[0], WINDOW_SIZE[1])))
+        self.walls.append(Wall(self.display, (0, 0), (WINDOW_SIZE[0], 0)))
+        self.walls.append(Wall(self.display, (0, 0), (0, WINDOW_SIZE[1])))
+        self.walls.append(Wall(self.display, (WINDOW_SIZE[0], 0), (WINDOW_SIZE[0], WINDOW_SIZE[1])))
+        self.walls.append(Wall(self.display, (0, WINDOW_SIZE[1]), (WINDOW_SIZE[0], WINDOW_SIZE[1])))
 
-        return walls
+    def generate_random_walls(self, random_walls_count):
+        for i in range(random_walls_count):
+            start_x = random.randint(0, WINDOW_SIZE[0])
+            start_y = random.randint(0, WINDOW_SIZE[1])
+            end_x = random.randint(0, WINDOW_SIZE[0])
+            end_y = random.randint(0, WINDOW_SIZE[1])
+
+            self.walls.append(Wall(self.display, (start_x, start_y), (end_x, end_y)))
+
 
     def generate_rays(self):
         rays = []
