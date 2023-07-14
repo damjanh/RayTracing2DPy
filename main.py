@@ -30,19 +30,41 @@ class Ray:
         print(pos)
 
     def check_collision(self, wall):
-        return None
+        x1 = wall.start_pos[0]
+        y1 = wall.start_pos[1]
+        x2 = wall.end_pos[0]
+        y2 = wall.end_pos[1]
+
+        x3 = self.pos[0]
+        y3 = self.pos[1]
+        x4 = self.pos[0] + self.direction[0]
+        y4 = self.pos[1] + self.direction[1]
+
+        # Using line-line intersection formula to get intersection point of ray and wall
+        # Where (x1, y1), (x2, y2) are the ray pos and (x3, y3), (x4, y4) are the wall pos
+        denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+        numerator = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)
+        if denominator == 0:
+            return None
+
+        t = numerator / denominator
+        u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator
+
+        if 1 > t > 0 and u > 0:
+            x = x1 + t * (x2 - x1)
+            y = y1 + t * (y2 - y1)
+            collide_position = [x, y]
+            return collide_position
 
     def render(self, display, walls):
-        global last_closest_point
-
         closest = 100000
         closest_point = None
         for wall in walls:
             intersect_point = self.check_collision(wall)
             if intersect_point is not None:
                 # Get distance between ray source and intersect point
-                ray_dx = self.pos.x - intersect_point[0]
-                ray_dy = self.pos.y - intersect_point[1]
+                ray_dx = self.pos[0] - intersect_point[0]
+                ray_dy = self.pos[1] - intersect_point[1]
 
                 distance = math.sqrt(ray_dx ** 2 + ray_dy ** 2)
                 if distance < closest:
@@ -60,12 +82,12 @@ class Game:
         self.screen = pygame.display.set_mode(WINDOW_SIZE)
         self.display = pygame.Surface(WINDOW_SIZE)
 
-        self.walls = self.generateWalls()
+        self.walls = self.generate_walls()
         self.walls.append(Wall(self.display, (0, 0), (800, 600), 'white'))
 
         self.rays = self.generate_rays()
 
-    def generateWalls(self):
+    def generate_walls(self):
         walls = []
         walls.append(Wall(self.display, (0, 0), (WINDOW_SIZE[0], 0)))
         walls.append(Wall(self.display, (0, 0), (0, WINDOW_SIZE[1])))
@@ -73,7 +95,6 @@ class Game:
         walls.append(Wall(self.display, (0, WINDOW_SIZE[1]), (WINDOW_SIZE[0], WINDOW_SIZE[1])))
 
         return walls
-
 
     def generate_rays(self):
         rays = []
